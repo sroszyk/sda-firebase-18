@@ -1,6 +1,6 @@
 import './../styles/styles.css';
 import { initializeApp } from "firebase/app";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, getStorage, ref, uploadBytes, listAll, list } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBJwX2FSrFkzxWXTiUHzu3TcGHi-ijfPGs",
@@ -53,26 +53,38 @@ const storage = getStorage(app);
 //ZADANKO!
 //1. Po przesłaniu obrazka wyświetl ten obrazek w HTMLu
 // -- Wykorzystaj metode getDownloadURL
-const myBtn = document.getElementById("mySendBtn");
-myBtn.addEventListener("click", () => {
-    const myResult = document.getElementById("myResult");
+// const myBtn = document.getElementById("mySendBtn");
+// myBtn.addEventListener("click", () => {
+//     const myResult = document.getElementById("myResult");
 
-    const file = document.getElementById("myFileInput").files[0];
-    if (file) {
-        myResult.innerText = "Przesyłam...";
-        const myFileNameInput = document.getElementById("myFileNameInput");
-        const myFileRef = ref(storage, myFileNameInput.value);
+//     const file = document.getElementById("myFileInput").files[0];
+//     if (file) {
+//         myResult.innerText = "Przesyłam...";
+//         const myFileNameInput = document.getElementById("myFileNameInput");
+//         const myFileRef = ref(storage, myFileNameInput.value);
 
-        uploadBytes(myFileRef, file).then((result) => {
-            myResult.innerText = "Przesłano!";
+//         uploadBytes(myFileRef, file).then((result) => {
+//             myResult.innerText = "Przesłano!";
 
-            getDownloadURL(result.ref).then((url) => {
-                const myImage = document.getElementById("myImage");
-                myImage.src = url;
-            });
-        });
-    }
-    else {
-        myResult.innerText = "Error: Wybierz plik!";
-    }
-});
+//             getDownloadURL(result.ref).then((url) => {
+//                 const myImage = document.getElementById("myImage");
+//                 myImage.src = url;
+//             });
+//         });
+//     }
+//     else {
+//         myResult.innerText = "Error: Wybierz plik!";
+//     }
+// });
+
+//ZADANKO
+//1. Wyświetl wszystkie pliki w postaci listy numerowanej bądź nienumerowanej
+const storageRef = ref(storage);
+listAll(storageRef).then((res) => {
+    const myList = document.getElementById("myFilesList");
+    res.items.forEach(item => {
+        const listItem = document.createElement("li");
+        listItem.innerText = item.fullPath;
+        myList.appendChild(listItem);
+    })
+})
