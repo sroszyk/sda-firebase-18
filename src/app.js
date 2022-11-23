@@ -99,16 +99,43 @@ const storage = getStorage(app);
 
 //ZADANKO
 // Wyswietl wszystkie obrazki, które są w twoim CloudStorage
+// const storageRef = ref(storage);
+// listAll(storageRef).then((res) => {
+//     res.items.forEach(item => {
+//         const img = document.createElement("img");
+//         const div = document.createElement("div");
+
+//         div.classList.add("card");
+//         img.classList.add('image');
+
+//         div.appendChild(img);
+//         document.body.appendChild(div);
+
+//         getDownloadURL(item).then((url) => {
+//             img.src = url;
+//         })
+//     })
+// })
+
+
+//ZADANKO
+// Dodajemy przycisk usuń, który usuwa wskazane zdjęcie i odświeża liste.
 const storageRef = ref(storage);
 listAll(storageRef).then((res) => {
     res.items.forEach(item => {
         const img = document.createElement("img");
         const div = document.createElement("div");
+        const deleteBtn = document.createElement("button");
+        deleteBtn.innerText = "Delete";
+        deleteBtn.dataset.imageName = item.fullPath;
+
+        
 
         div.classList.add("card");
         img.classList.add('image');
 
         div.appendChild(img);
+        div.appendChild(deleteBtn);
         document.body.appendChild(div);
 
         getDownloadURL(item).then((url) => {
