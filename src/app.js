@@ -91,7 +91,6 @@ const storage = getStorage(app);
 
 
 // const imageRef = ref(storage, "Test2.jpg");
-
 // deleteObject(imageRef).then(() => {
 //     console.log("Plik usunieto!");
 // });
@@ -120,26 +119,42 @@ const storage = getStorage(app);
 
 //ZADANKO
 // Dodajemy przycisk usuń, który usuwa wskazane zdjęcie i odświeża liste.
-const storageRef = ref(storage);
-listAll(storageRef).then((res) => {
-    res.items.forEach(item => {
-        const img = document.createElement("img");
-        const div = document.createElement("div");
-        const deleteBtn = document.createElement("button");
-        deleteBtn.innerText = "Delete";
-        deleteBtn.dataset.imageName = item.fullPath;
+function loadImagesList() {
+    const storageRef = ref(storage);
+    document.body.innerHTML = "";
+    listAll(storageRef).then((res) => {
+        res.items.forEach(item => {
+            const img = document.createElement("img");
+            const div = document.createElement("div");
+            const deleteBtn = document.createElement("button");
+            deleteBtn.innerText = "Delete";
+            deleteBtn.dataset.imageName = item.fullPath;
 
-        
+            // deleteBtn.addEventListener("click", (event) => {
+            //     const imageRef = ref(storage, event.target.dataset.imageName);
+            //     deleteObject(imageRef).then(() => {
+            //         console.log("Plik usunieto!");
+            //     });
+            // });
 
-        div.classList.add("card");
-        img.classList.add('image');
+            deleteBtn.addEventListener("click", () => {
+                deleteObject(item).then(() => {
+                    loadImagesList();
+                });
+            });
 
-        div.appendChild(img);
-        div.appendChild(deleteBtn);
-        document.body.appendChild(div);
+            div.classList.add("card");
+            img.classList.add('image');
 
-        getDownloadURL(item).then((url) => {
-            img.src = url;
+            div.appendChild(img);
+            div.appendChild(deleteBtn);
+            document.body.appendChild(div);
+
+            getDownloadURL(item).then((url) => {
+                img.src = url;
+            })
         })
     })
-})
+}
+
+loadImagesList();
