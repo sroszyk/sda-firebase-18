@@ -1,6 +1,6 @@
 import './../styles/styles.css';
 import { initializeApp } from "firebase/app";
-import { getDownloadURL, getStorage, ref, uploadBytes, listAll, list } from "firebase/storage";
+import { getDownloadURL, getStorage, ref, uploadBytes, listAll, list, deleteObject } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBJwX2FSrFkzxWXTiUHzu3TcGHi-ijfPGs",
@@ -56,8 +56,8 @@ const storage = getStorage(app);
 // const myBtn = document.getElementById("mySendBtn");
 // myBtn.addEventListener("click", () => {
 //     const myResult = document.getElementById("myResult");
-
 //     const file = document.getElementById("myFileInput").files[0];
+
 //     if (file) {
 //         myResult.innerText = "Przesyłam...";
 //         const myFileNameInput = document.getElementById("myFileNameInput");
@@ -79,12 +79,40 @@ const storage = getStorage(app);
 
 //ZADANKO
 //1. Wyświetl wszystkie pliki w postaci listy numerowanej bądź nienumerowanej
+// const storageRef = ref(storage);
+// listAll(storageRef).then((res) => {
+//     const myList = document.getElementById("myFilesList");
+//     res.items.forEach(item => {
+//         const listItem = document.createElement("li");
+//         listItem.innerText = item.fullPath;
+//         myList.appendChild(listItem);
+//     })
+// })
+
+
+// const imageRef = ref(storage, "Test2.jpg");
+
+// deleteObject(imageRef).then(() => {
+//     console.log("Plik usunieto!");
+// });
+
+
+//ZADANKO
+// Wyswietl wszystkie obrazki, które są w twoim CloudStorage
 const storageRef = ref(storage);
 listAll(storageRef).then((res) => {
-    const myList = document.getElementById("myFilesList");
     res.items.forEach(item => {
-        const listItem = document.createElement("li");
-        listItem.innerText = item.fullPath;
-        myList.appendChild(listItem);
+        const img = document.createElement("img");
+        const div = document.createElement("div");
+
+        div.classList.add("card");
+        img.classList.add('image');
+
+        div.appendChild(img);
+        document.body.appendChild(div);
+
+        getDownloadURL(item).then((url) => {
+            img.src = url;
+        })
     })
 })
