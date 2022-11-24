@@ -201,6 +201,9 @@ const db = getFirestore(app);
 
 //ZADANKO
 // Wyswietl liste (imie i nazwisko) wszystkich dokumentów w users
+// Dodaj przycisk EDIT do każdego list itema
+// Po kliknięciu na EDIT inputy mają zostać uzupełnione o dane z dokumentu
+// Po kliknięciu na SAVE dokument ma zostać zaktualizowany
 const myName = document.getElementById("myName");
 const mySurname = document.getElementById("mySurname");
 const myAge = document.getElementById("myAge");
@@ -212,15 +215,27 @@ getDocs(usersCollection).then((docs) => {
     docs.forEach((userDoc) => {
         const user = userDoc.data();
         const listItem = document.createElement("li");
+        const editBtn = document.createElement("button");
+        editBtn.innerText = "Edit";
+        
+        editBtn.addEventListener("click", () => {
+            myName.value = user.Name;
+            mySurname.value = user.Surname;
+            myAge.value = user.Age;
+            myBtn.dataset.userId = userDoc.id;
+        });
+
         listItem.innerText = `${user.Name} ${user.Surname}`;
+        listItem.appendChild(editBtn);
         myUsersList.appendChild(listItem);
     })
 });
 
-// myBtn.addEventListener("click", () => {
-//     updateDoc(myDoc, {
-//         Name: myName.value,
-//         Surname: mySurname.value,
-//         Age: parseInt(myAge.value)
-//     })
-// })
+myBtn.addEventListener("click", (event) => {
+    const myDoc = doc(db, "users", event.target.dataset.userId);
+    updateDoc(myDoc, {
+        Name: myName.value,
+        Surname: mySurname.value,
+        Age: parseInt(myAge.value)
+    })
+})
