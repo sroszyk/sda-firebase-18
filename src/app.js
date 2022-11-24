@@ -1,7 +1,7 @@
 import './../styles/styles.css';
 import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage } from "firebase/storage";
-import { addDoc, collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore"
+import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore"
 
 const firebaseConfig = {
     apiKey: "AIzaSyBJwX2FSrFkzxWXTiUHzu3TcGHi-ijfPGs",
@@ -204,38 +204,61 @@ const db = getFirestore(app);
 // Dodaj przycisk EDIT do każdego list itema
 // Po kliknięciu na EDIT inputy mają zostać uzupełnione o dane z dokumentu
 // Po kliknięciu na SAVE dokument ma zostać zaktualizowany
+// const myName = document.getElementById("myName");
+// const mySurname = document.getElementById("mySurname");
+// const myAge = document.getElementById("myAge");
+// const myBtn = document.getElementById("myBtn");
+// const myUsersList = document.getElementById("myUsersList");
+
+// const usersCollection = collection(db, "users");
+// getDocs(usersCollection).then((docs) => {
+//     docs.forEach((userDoc) => {
+//         const user = userDoc.data();
+//         const listItem = document.createElement("li");
+//         const editBtn = document.createElement("button");
+//         editBtn.innerText = "Edit";
+
+//         editBtn.addEventListener("click", () => {
+//             myName.value = user.Name;
+//             mySurname.value = user.Surname;
+//             myAge.value = user.Age;
+//             myBtn.dataset.userId = userDoc.id;
+//         });
+
+//         listItem.innerText = `${user.Name} ${user.Surname}`;
+//         listItem.appendChild(editBtn);
+//         myUsersList.appendChild(listItem);
+//     })
+// });
+
+// myBtn.addEventListener("click", (event) => {
+//     const myDoc = doc(db, "users", event.target.dataset.userId);
+//     updateDoc(myDoc, {
+//         Name: myName.value,
+//         Surname: mySurname.value,
+//         Age: parseInt(myAge.value)
+//     })
+// })
+
+
+//ZADANKO
+// Utwórz dokument HTML zawierający pole input i przycisk. Po naciśnięciu przycisku
+// utwórz query bazując na imieniu wprowadzonym do pola input. Wykorzystaj query aby
+// pobrać listę użytkowników spełniających dane kryterium i wyświetl ich w liście
 const myName = document.getElementById("myName");
-const mySurname = document.getElementById("mySurname");
-const myAge = document.getElementById("myAge");
 const myBtn = document.getElementById("myBtn");
 const myUsersList = document.getElementById("myUsersList");
 
-const usersCollection = collection(db, "users");
-getDocs(usersCollection).then((docs) => {
-    docs.forEach((userDoc) => {
-        const user = userDoc.data();
-        const listItem = document.createElement("li");
-        const editBtn = document.createElement("button");
-        editBtn.innerText = "Edit";
-        
-        editBtn.addEventListener("click", () => {
-            myName.value = user.Name;
-            mySurname.value = user.Surname;
-            myAge.value = user.Age;
-            myBtn.dataset.userId = userDoc.id;
-        });
-
-        listItem.innerText = `${user.Name} ${user.Surname}`;
-        listItem.appendChild(editBtn);
-        myUsersList.appendChild(listItem);
-    })
+myBtn.addEventListener("click", () => {
+    const usersCollection = collection(db, "users");
+    const myQuery = query(usersCollection, where("Name", "==", myName.value));
+    getDocs(myQuery).then((docs) => {
+        myUsersList.innerHTML = "";
+        docs.forEach((userDoc) => {
+            const user = userDoc.data();
+            const listItem = document.createElement("li");
+            listItem.innerText = `${user.Name} ${user.Surname}`;
+            myUsersList.appendChild(listItem);
+        })
+    });
 });
-
-myBtn.addEventListener("click", (event) => {
-    const myDoc = doc(db, "users", event.target.dataset.userId);
-    updateDoc(myDoc, {
-        Name: myName.value,
-        Surname: mySurname.value,
-        Age: parseInt(myAge.value)
-    })
-})
