@@ -1,6 +1,7 @@
 import './../styles/styles.css';
 import { initializeApp } from "firebase/app";
-import { getDownloadURL, getStorage, ref, uploadBytes, listAll, list, deleteObject } from "firebase/storage";
+import { getDownloadURL, getStorage } from "firebase/storage";
+import { addDoc, collection, doc, getDoc, getFirestore, setDoc, updateDoc } from "firebase/firestore"
 
 const firebaseConfig = {
     apiKey: "AIzaSyBJwX2FSrFkzxWXTiUHzu3TcGHi-ijfPGs",
@@ -117,44 +118,82 @@ const storage = getStorage(app);
 // })
 
 
+// //ZADANKO
+// // Dodajemy przycisk usuń, który usuwa wskazane zdjęcie i odświeża liste.
+// function loadImagesList() {
+//     const storageRef = ref(storage);
+//     document.body.innerHTML = "";
+//     listAll(storageRef).then((res) => {
+//         res.items.forEach(item => {
+//             const img = document.createElement("img");
+//             const div = document.createElement("div");
+//             const deleteBtn = document.createElement("button");
+//             deleteBtn.innerText = "Delete";
+//             deleteBtn.dataset.imageName = item.fullPath;
+
+//             // deleteBtn.addEventListener("click", (event) => {
+//             //     const imageRef = ref(storage, event.target.dataset.imageName);
+//             //     deleteObject(imageRef).then(() => {
+//             //         console.log("Plik usunieto!");
+//             //     });
+//             // });
+
+//             deleteBtn.addEventListener("click", () => {
+//                 deleteObject(item).then(() => {
+//                     loadImagesList();
+//                 });
+//             });
+
+//             div.classList.add("card");
+//             img.classList.add('image');
+
+//             div.appendChild(img);
+//             div.appendChild(deleteBtn);
+//             document.body.appendChild(div);
+
+//             getDownloadURL(item).then((url) => {
+//                 img.src = url;
+//             })
+//         })
+//     })
+// }
+
+// loadImagesList();
+
+const db = getFirestore(app);
+// const usersCollection = collection(db, "users");
+// addDoc(usersCollection, {
+//     Name: "Szymon",
+//     Surname: "Roszyk"
+// });
+
+// const myDoc = doc(db, "users", "NowyUserId");
+// getDoc(myDoc).then((respData) => {
+//     const myUser = respData.data();
+//     const test = myUser.Name;
+// });
+
 //ZADANKO
-// Dodajemy przycisk usuń, który usuwa wskazane zdjęcie i odświeża liste.
-function loadImagesList() {
-    const storageRef = ref(storage);
-    document.body.innerHTML = "";
-    listAll(storageRef).then((res) => {
-        res.items.forEach(item => {
-            const img = document.createElement("img");
-            const div = document.createElement("div");
-            const deleteBtn = document.createElement("button");
-            deleteBtn.innerText = "Delete";
-            deleteBtn.dataset.imageName = item.fullPath;
+// Pobierz dokument, a nastepnie jego pola (imie, nazwisko i wiek) przypisz do
+// 3 elementów HTML typu input. Następnie dodaj przycisk, który po kliknięciu pobierze aktualnie
+// wpisane dane w te inputy i zaktualizuje dokument o nowe wartość.
+const myName = document.getElementById("myName");
+const mySurname = document.getElementById("mySurname");
+const myAge = document.getElementById("myAge");
+const myBtn = document.getElementById("myBtn");
 
-            // deleteBtn.addEventListener("click", (event) => {
-            //     const imageRef = ref(storage, event.target.dataset.imageName);
-            //     deleteObject(imageRef).then(() => {
-            //         console.log("Plik usunieto!");
-            //     });
-            // });
+const myDoc = doc(db, "users", "NowyUserId");
+getDoc(myDoc).then((respData) => {
+    const myUser = respData.data();
+    myName.value = myUser.Name;
+    mySurname.value = myUser.Surname;
+    myAge.value = myUser.Age;
+});
 
-            deleteBtn.addEventListener("click", () => {
-                deleteObject(item).then(() => {
-                    loadImagesList();
-                });
-            });
-
-            div.classList.add("card");
-            img.classList.add('image');
-
-            div.appendChild(img);
-            div.appendChild(deleteBtn);
-            document.body.appendChild(div);
-
-            getDownloadURL(item).then((url) => {
-                img.src = url;
-            })
-        })
+myBtn.addEventListener("click", () => {
+    updateDoc(myDoc, {
+        Name: myName.value,
+        Surname: mySurname.value,
+        Age: parseInt(myAge.value)
     })
-}
-
-loadImagesList();
+})
