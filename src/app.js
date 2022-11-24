@@ -1,7 +1,7 @@
 import './../styles/styles.css';
 import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage } from "firebase/storage";
-import { addDoc, collection, doc, getDoc, getFirestore, setDoc, updateDoc } from "firebase/firestore"
+import { addDoc, collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore"
 
 const firebaseConfig = {
     apiKey: "AIzaSyBJwX2FSrFkzxWXTiUHzu3TcGHi-ijfPGs",
@@ -177,23 +177,50 @@ const db = getFirestore(app);
 // Pobierz dokument, a nastepnie jego pola (imie, nazwisko i wiek) przypisz do
 // 3 elementów HTML typu input. Następnie dodaj przycisk, który po kliknięciu pobierze aktualnie
 // wpisane dane w te inputy i zaktualizuje dokument o nowe wartość.
+// const myName = document.getElementById("myName");
+// const mySurname = document.getElementById("mySurname");
+// const myAge = document.getElementById("myAge");
+// const myBtn = document.getElementById("myBtn");
+
+// const myDoc = doc(db, "users", "NowyUserId");
+// getDoc(myDoc).then((respData) => {
+//     const myUser = respData.data();
+//     myName.value = myUser.Name;
+//     mySurname.value = myUser.Surname;
+//     myAge.value = myUser.Age;
+// });
+
+// myBtn.addEventListener("click", () => {
+//     updateDoc(myDoc, {
+//         Name: myName.value,
+//         Surname: mySurname.value,
+//         Age: parseInt(myAge.value)
+//     })
+// })
+
+
+//ZADANKO
+// Wyswietl liste (imie i nazwisko) wszystkich dokumentów w users
 const myName = document.getElementById("myName");
 const mySurname = document.getElementById("mySurname");
 const myAge = document.getElementById("myAge");
 const myBtn = document.getElementById("myBtn");
+const myUsersList = document.getElementById("myUsersList");
 
-const myDoc = doc(db, "users", "NowyUserId");
-getDoc(myDoc).then((respData) => {
-    const myUser = respData.data();
-    myName.value = myUser.Name;
-    mySurname.value = myUser.Surname;
-    myAge.value = myUser.Age;
+const usersCollection = collection(db, "users");
+getDocs(usersCollection).then((docs) => {
+    docs.forEach((userDoc) => {
+        const user = userDoc.data();
+        const listItem = document.createElement("li");
+        listItem.innerText = `${user.Name} ${user.Surname}`;
+        myUsersList.appendChild(listItem);
+    })
 });
 
-myBtn.addEventListener("click", () => {
-    updateDoc(myDoc, {
-        Name: myName.value,
-        Surname: mySurname.value,
-        Age: parseInt(myAge.value)
-    })
-})
+// myBtn.addEventListener("click", () => {
+//     updateDoc(myDoc, {
+//         Name: myName.value,
+//         Surname: mySurname.value,
+//         Age: parseInt(myAge.value)
+//     })
+// })
