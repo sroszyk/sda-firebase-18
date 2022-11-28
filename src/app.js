@@ -1,7 +1,8 @@
 import './../styles/styles.css';
 import { initializeApp } from "firebase/app";
-import { getDownloadURL, getStorage } from "firebase/storage";
-import { addDoc, arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore"
+import { getDownloadURL, getStorage, ref as storageRef } from "firebase/storage";
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore"
+import { getDatabase, onValue, push, ref, set } from "firebase/database";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBJwX2FSrFkzxWXTiUHzu3TcGHi-ijfPGs",
@@ -9,12 +10,15 @@ const firebaseConfig = {
     projectId: "sda-firebase-9021a",
     storageBucket: "sda-firebase-9021a.appspot.com",
     messagingSenderId: "994801333963",
-    appId: "1:994801333963:web:5f83dfd22504d1c5660d4e"
+    appId: "1:994801333963:web:5f83dfd22504d1c5660d4e",
+    databaseURL: "https://sda-firebase-9021a-default-rtdb.europe-west1.firebasedatabase.app",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
+//const db = getFirestore(app);
+const db = getDatabase();
 
 
 //ZADANKO!
@@ -160,7 +164,6 @@ const storage = getStorage(app);
 
 // loadImagesList();
 
-const db = getFirestore(app);
 // const usersCollection = collection(db, "users");
 // addDoc(usersCollection, {
 //     Name: "Szymon",
@@ -265,31 +268,47 @@ const db = getFirestore(app);
 
 
 //ZADANKO 
-const childrenList = document.getElementById("childrenList");
-const childNameInput = document.getElementById("childName");
-const addChildBtn = document.getElementById("addChildBtn");
-const janKowalskiDoc = doc(db, "users", "JanKowalskiId");
+// const childrenList = document.getElementById("childrenList");
+// const childNameInput = document.getElementById("childName");
+// const addChildBtn = document.getElementById("addChildBtn");
+// const janKowalskiDoc = doc(db, "users", "JanKowalskiId");
 
-function refresh() {
-    childrenList.innerHTML = "";
-    getDoc(janKowalskiDoc).then((docRes) => {
-        const janek = docRes.data();
-        janek.Dzieci.forEach(dziecko => {
-            const itemDziecko = document.createElement("li");
-            itemDziecko.innerText = dziecko;
-            childrenList.appendChild(itemDziecko);
-            //TUTAJ DODAJ PRZYCISK DELETE
-            // + EVENT LISTENER NA CLICK
-        });
-    });
-}
 
-addChildBtn.addEventListener("click", () => {
-    updateDoc(janKowalskiDoc, {
-        Dzieci: arrayUnion(childNameInput.value)
-    }).then(() => {
-        refresh()
+// onSnapshot(janKowalskiDoc, (docRes) => {
+//     childrenList.innerHTML = "";
+//     const janek = docRes.data();
+//     janek.Dzieci.forEach(dziecko => {
+//         const itemDziecko = document.createElement("li");
+//         itemDziecko.innerText = dziecko;
+//         childrenList.appendChild(itemDziecko);
+//         //TUTAJ DODAJ PRZYCISK DELETE
+//         // + EVENT LISTENER NA CLICK
+//     });
+// });
+
+// addChildBtn.addEventListener("click", () => {
+//     updateDoc(janKowalskiDoc, {
+//         Dzieci: arrayUnion(childNameInput.value)
+//     });
+// })
+
+const userName = document.getElementById("userName");
+const userSurname = document.getElementById("userSurname");
+const addUserBtn = document.getElementById("addUserBtn");
+const usersRef = ref(db, "users");
+
+addUserBtn.addEventListener("click", () => {
+    const userRef = push(usersRef);
+    set(userRef, {
+        name: userName.value,
+        surname: userSurname.value
+    })
+})
+
+
+onValue(usersRef, (snapshot) => {
+    snapshot.forEach(user => {
+        console.log(user.key);
     });
 })
 
-refresh();
