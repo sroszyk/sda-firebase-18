@@ -1,7 +1,7 @@
 import './../styles/styles.css';
 import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage } from "firebase/storage";
-import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore"
+import { addDoc, arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore"
 
 const firebaseConfig = {
     apiKey: "AIzaSyBJwX2FSrFkzxWXTiUHzu3TcGHi-ijfPGs",
@@ -62,7 +62,7 @@ const storage = getStorage(app);
 //     if (file) {
 //         myResult.innerText = "Przesyłam...";
 //         const myFileNameInput = document.getElementById("myFileNameInput");
-//         const myFileRef = ref(storage, myFileNameInput.value);
+//           const myFileRef = ref(storage, myFileNameInput.value);
 
 //         uploadBytes(myFileRef, file).then((result) => {
 //             myResult.innerText = "Przesłano!";
@@ -245,20 +245,51 @@ const db = getFirestore(app);
 // Utwórz dokument HTML zawierający pole input i przycisk. Po naciśnięciu przycisku
 // utwórz query bazując na imieniu wprowadzonym do pola input. Wykorzystaj query aby
 // pobrać listę użytkowników spełniających dane kryterium i wyświetl ich w liście
-const myName = document.getElementById("myName");
-const myBtn = document.getElementById("myBtn");
-const myUsersList = document.getElementById("myUsersList");
+// const myName = document.getElementById("myName");
+// const myBtn = document.getElementById("myBtn");
+// const myUsersList = document.getElementById("myUsersList");
 
-myBtn.addEventListener("click", () => {
-    const usersCollection = collection(db, "users");
-    const myQuery = query(usersCollection, where("Name", "==", myName.value));
-    getDocs(myQuery).then((docs) => {
-        myUsersList.innerHTML = "";
-        docs.forEach((userDoc) => {
-            const user = userDoc.data();
-            const listItem = document.createElement("li");
-            listItem.innerText = `${user.Name} ${user.Surname}`;
-            myUsersList.appendChild(listItem);
-        })
+// myBtn.addEventListener("click", () => {
+//     const usersCollection = collection(db, "users");
+//     const myQuery = query(usersCollection, where("Name", "==", myName.value));
+//     getDocs(myQuery).then((docs) => {
+//         myUsersList.innerHTML = "";
+//         docs.forEach((userDoc) => {
+//             const user = userDoc.data();
+//             const listItem = document.createElement("li");
+//             listItem.innerText = `${user.Name} ${user.Surname}`;
+//             myUsersList.appendChild(listItem);
+//         })
+//     });
+// });
+
+
+//ZADANKO 
+const childrenList = document.getElementById("childrenList");
+const childNameInput = document.getElementById("childName");
+const addChildBtn = document.getElementById("addChildBtn");
+const janKowalskiDoc = doc(db, "users", "JanKowalskiId");
+
+function refresh() {
+    childrenList.innerHTML = "";
+    getDoc(janKowalskiDoc).then((docRes) => {
+        const janek = docRes.data();
+        janek.Dzieci.forEach(dziecko => {
+            const itemDziecko = document.createElement("li");
+            itemDziecko.innerText = dziecko;
+            childrenList.appendChild(itemDziecko);
+            //TUTAJ DODAJ PRZYCISK DELETE
+            // + EVENT LISTENER NA CLICK
+        });
     });
-});
+}
+
+addChildBtn.addEventListener("click", () => {
+    updateDoc(janKowalskiDoc, {
+        Dzieci: arrayUnion(childNameInput.value)
+    }).then(() => {
+        refresh()
+    });
+})
+
+refresh();
