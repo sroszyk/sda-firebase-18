@@ -298,13 +298,13 @@ const db = getDatabase();
 // const usersRef = ref(db, "users");
 // const usersList = document.getElementById("usersList");
 
-addUserBtn.addEventListener("click", () => {
-    const userRef = push(usersRef);
-    set(userRef, {
-        name: userName.value,
-        surname: userSurname.value
-    })
-}
+// addUserBtn.addEventListener("click", () => {
+//     const userRef = push(usersRef);
+//     set(userRef, {
+//         name: userName.value,
+//         surname: userSurname.value
+//     })
+// }
 // onValue(usersRef, (snapshot) => {
 //     usersList.innerHTML = "";
 //     snapshot.forEach(userSnapshot => {
@@ -341,3 +341,40 @@ addUserBtn.addEventListener("click", () => {
 // })
 
 
+const usernameInput = document.getElementById("username");
+const usercolorInput = document.getElementById("usercolor");
+const adduserBtn = document.getElementById("adduser");
+const userSelect = document.getElementById("userselect");
+const selectedUserHeader = document.getElementById("selecteduser");
+let selectedUser = {};
+
+adduserBtn.addEventListener("click", () => {
+    const userRef = ref(db, `users/${usernameInput.value}`);
+    set(userRef, {
+        color: usercolorInput.value
+    });
+});
+
+userSelect.addEventListener("change", () => {
+    selectedUser = {
+        username: userSelect.value,
+        color: userSelect.selectedOptions[0].dataset.color
+    }
+    selectedUserHeader.innerText = userSelect.value;
+    selectedUserHeader.style.color = userSelect.selectedOptions[0].dataset.color;
+})
+
+const usersRef = ref(db, "users");
+onValue(usersRef, (snapshot) => {
+    userSelect.innerHTML = "";
+    const emptyOption = document.createElement("option");
+    userSelect.appendChild(emptyOption);
+
+    snapshot.forEach(userSnapshot => {
+        const user = userSnapshot.val();
+        const option = document.createElement("option");
+        option.innerText = userSnapshot.key;
+        option.dataset.color = user.color;
+        userSelect.appendChild(option);
+    })
+})
