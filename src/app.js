@@ -1,6 +1,6 @@
 import './../styles/styles.css';
 import { initializeApp } from "firebase/app";
-import { getDownloadURL, getStorage, ref as storageRef } from "firebase/storage";
+import { getDownloadURL, getStorage, list, ref as storageRef } from "firebase/storage";
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore"
 import { getDatabase, onValue, push, ref, set } from "firebase/database";
 
@@ -296,6 +296,7 @@ const userName = document.getElementById("userName");
 const userSurname = document.getElementById("userSurname");
 const addUserBtn = document.getElementById("addUserBtn");
 const usersRef = ref(db, "users");
+const usersList = document.getElementById("usersList");
 
 addUserBtn.addEventListener("click", () => {
     const userRef = push(usersRef);
@@ -307,8 +308,12 @@ addUserBtn.addEventListener("click", () => {
 
 
 onValue(usersRef, (snapshot) => {
-    snapshot.forEach(user => {
-        console.log(user.key);
+    usersList.innerHTML = "";
+    snapshot.forEach(userSnapshot => {
+        const user = userSnapshot.val();
+        const listItem = document.createElement("li");
+        listItem.innerText = `${user.name} ${user.surname}`;
+        usersList.appendChild(listItem);
     });
 })
 
