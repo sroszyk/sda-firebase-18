@@ -298,12 +298,13 @@ const db = getDatabase();
 // const usersRef = ref(db, "users");
 // const usersList = document.getElementById("usersList");
 
-// addUserBtn.addEventListener("click", () => {
-// const docRef = ref(db, "doc");//push(usersRef);
-// set(userRef, {
-//     text: ""
-// })
-
+addUserBtn.addEventListener("click", () => {
+    const userRef = push(usersRef);
+    set(userRef, {
+        name: userName.value,
+        surname: userSurname.value
+    })
+}
 // onValue(usersRef, (snapshot) => {
 //     usersList.innerHTML = "";
 //     snapshot.forEach(userSnapshot => {
@@ -324,17 +325,19 @@ const db = getDatabase();
 
 
 //ZADANKO
-const fakeDoc = document.getElementById("fakeDoc");
-const docRef = ref(db, "doc");
-fakeDoc.addEventListener("input", () => {
-    set(docRef, {
-        text: fakeDoc.value
-    });
-});
+// const fakeDoc = document.getElementById("fakeDoc");
+// const docRef = ref(db, "doc");
+// fakeDoc.addEventListener("input", () => {
+//     set(docRef, {
+//         text: fakeDoc.value
+//     });
+// });
 
-onValue(docRef, (snapshot) => {
-    const docObj = snapshot.val();
-    if(fakeDoc.value !== docObj.text){
-        fakeDoc.value = docObj.text;
-    }
-})
+// onValue(docRef, (snapshot) => {
+//     const docObj = snapshot.val();
+//     if(fakeDoc.value !== docObj.text){
+//         fakeDoc.value = docObj.text;
+//     }
+// })
+
+
