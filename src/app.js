@@ -2,7 +2,7 @@ import './../styles/styles.css';
 import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage, list, ref as storageRef } from "firebase/storage";
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore"
-import { getDatabase, onValue, push, ref, set } from "firebase/database";
+import { getDatabase, onValue, push, ref, remove, set } from "firebase/database";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBJwX2FSrFkzxWXTiUHzu3TcGHi-ijfPGs",
@@ -292,28 +292,49 @@ const db = getDatabase();
 //     });
 // })
 
-const userName = document.getElementById("userName");
-const userSurname = document.getElementById("userSurname");
-const addUserBtn = document.getElementById("addUserBtn");
-const usersRef = ref(db, "users");
-const usersList = document.getElementById("usersList");
+// const userName = document.getElementById("userName");
+// const userSurname = document.getElementById("userSurname");
+// const addUserBtn = document.getElementById("addUserBtn");
+// const usersRef = ref(db, "users");
+// const usersList = document.getElementById("usersList");
 
-addUserBtn.addEventListener("click", () => {
-    const userRef = push(usersRef);
-    set(userRef, {
-        name: userName.value,
-        surname: userSurname.value
-    })
-})
+// addUserBtn.addEventListener("click", () => {
+// const docRef = ref(db, "doc");//push(usersRef);
+// set(userRef, {
+//     text: ""
+// })
+
+// onValue(usersRef, (snapshot) => {
+//     usersList.innerHTML = "";
+//     snapshot.forEach(userSnapshot => {
+//         const user = userSnapshot.val();
+//         const listItem = document.createElement("li");
+//         listItem.innerText = `${user.name} ${user.surname}`;
+
+//         const removeBtn = document.createElement("button");
+//         removeBtn.innerText = "Remove";
+//         removeBtn.addEventListener("click", () => {
+//             remove(userSnapshot.ref);
+//         });
+//         listItem.appendChild(removeBtn);
+
+//         usersList.appendChild(listItem);
+//     });
+// })
 
 
-onValue(usersRef, (snapshot) => {
-    usersList.innerHTML = "";
-    snapshot.forEach(userSnapshot => {
-        const user = userSnapshot.val();
-        const listItem = document.createElement("li");
-        listItem.innerText = `${user.name} ${user.surname}`;
-        usersList.appendChild(listItem);
+//ZADANKO
+const fakeDoc = document.getElementById("fakeDoc");
+const docRef = ref(db, "doc");
+fakeDoc.addEventListener("input", () => {
+    set(docRef, {
+        text: fakeDoc.value
     });
-})
+});
 
+onValue(docRef, (snapshot) => {
+    const docObj = snapshot.val();
+    if(fakeDoc.value !== docObj.text){
+        fakeDoc.value = docObj.text;
+    }
+})
