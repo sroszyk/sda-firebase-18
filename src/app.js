@@ -430,15 +430,25 @@ buttonSignOut.addEventListener("click", () => {
     signOut(auth);
 })
 
-sendPhotoBtn.addEventListener("click", () => {
+// sendPhotoBtn.addEventListener("click", () => {
+//     const file = profilePhotoInput.files[0];
+//     const fileRef = storageRef(storage, `${auth.currentUser.uid}/${file.name}`);
+//     uploadBytes(fileRef, file).then(result => {
+//         getDownloadURL(fileRef).then((url) => {
+//             updateProfile(auth.currentUser, {
+//                 photoURL: url
+//             });
+//         });
+//     });
+// });
+
+sendPhotoBtn.addEventListener("click", async () => {
     const file = profilePhotoInput.files[0];
     const fileRef = storageRef(storage, `${auth.currentUser.uid}/${file.name}`);
-    uploadBytes(fileRef, file).then(result => {
-        getDownloadURL(fileRef).then((url) => {
-            updateProfile(auth.currentUser, {
-                photoURL: url
-            });
-        });
+    const _ = await uploadBytes(fileRef, file);
+    const url = await getDownloadURL(fileRef);
+    updateProfile(auth.currentUser, {
+        photoURL: url
     });
 });
 
