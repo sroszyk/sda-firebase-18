@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage, list, ref as storageRef, uploadBytes } from "firebase/storage";
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore"
 import { getDatabase, onChildAdded, onValue, push, ref, remove, set } from "firebase/database";
-import { getAuth, EmailAuthProvider, onAuthStateChanged, signOut, updateProfile } from "firebase/auth";
+import { getAuth, EmailAuthProvider, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider } from "firebase/auth";
 import * as firebaseui from 'firebaseui';
 
 const firebaseConfig = {
@@ -19,8 +19,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
-//const db = getFirestore(app);
-const db = getDatabase();
+const db = getFirestore(app);
+//const db = getDatabase();
 
 
 //ZADANKO!
@@ -426,9 +426,24 @@ const buttonSignOut = document.getElementById("signOutButton");
 const profilePhotoInput = document.getElementById("profilePhotoInput");
 const sendPhotoBtn = document.getElementById("sendPhoto");
 const photoProfileImg = document.getElementById("profilePhoto"); 
+const addressInput = document.getElementById("address");
+const motherNameInput = document.getElementById("motherName");
+const salary = document.getElementById("salary");
+const phoneNumber = document.getElementById("phoneNumber");
+const updateBtn = document.getElementById("updateBtn");
 
 buttonSignOut.addEventListener("click", () => {
     signOut(auth);
+})
+
+updateBtn.addEventListener("click", () => {
+    const docRef = doc(db, `users/${auth.currentUser.uid}`);
+    setDoc(docRef, {
+        address: addressInput.value,
+        motherName: motherNameInput.value,
+        salary: salary.value,
+        phoneNumber: phoneNumber.value
+    });
 })
 
 // sendPhotoBtn.addEventListener("click", () => {
@@ -480,7 +495,8 @@ onAuthStateChanged(auth, (user) => {
                 }
             },
             signInOptions: [
-                EmailAuthProvider.PROVIDER_ID
+                EmailAuthProvider.PROVIDER_ID,
+                GoogleAuthProvider.PROVIDER_ID
             ],
             signInSuccessUrl: "http://localhost:8080/"
         });
