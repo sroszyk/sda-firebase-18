@@ -423,8 +423,9 @@ const auth = getAuth(app);
 
 const loginHeader = document.getElementById("loginHeader");
 const buttonSignOut = document.getElementById("signOutButton");
-const profilePhotoInput = document.getElementById("profilePhoto");
+const profilePhotoInput = document.getElementById("profilePhotoInput");
 const sendPhotoBtn = document.getElementById("sendPhoto");
+const photoProfileImg = document.getElementById("profilePhoto"); 
 
 buttonSignOut.addEventListener("click", () => {
     signOut(auth);
@@ -454,16 +455,21 @@ sendPhotoBtn.addEventListener("click", async () => {
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
+        console.log(photoProfileImg.classList);
         loginHeader.innerText = `Witaj ${user.displayName}!`
+        photoProfileImg.src = user.photoURL;
         buttonSignOut.classList.remove("hidden");
         profilePhotoInput.classList.remove("hidden");
         sendPhotoBtn.classList.remove("hidden");
+        photoProfileImg.classList.remove("hidden");
+        
     }
     else {
         loginHeader.innerText = "Zaloguj się! Dziadu!";
         buttonSignOut.classList.add("hidden");
         profilePhotoInput.classList.add("hidden");
         sendPhotoBtn.classList.add("hidden");
+        photoProfileImg.classList.add("hidden");
 
         const ui = new firebaseui.auth.AuthUI(auth);
         ui.start('#firebaseui-auth-container', {
