@@ -1,9 +1,9 @@
 import './../styles/styles.css';
 import { initializeApp } from "firebase/app";
-import { getDownloadURL, getStorage, list, ref as storageRef } from "firebase/storage";
+import { getDownloadURL, getStorage, list, ref as storageRef, uploadBytes } from "firebase/storage";
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore"
 import { getDatabase, onChildAdded, onValue, push, ref, remove, set } from "firebase/database";
-import { getAuth, EmailAuthProvider, onAuthStateChanged } from "firebase/auth";
+import { getAuth, EmailAuthProvider, onAuthStateChanged, signOut, updateProfile } from "firebase/auth";
 import * as firebaseui from 'firebaseui';
 
 const firebaseConfig = {
@@ -50,7 +50,7 @@ const db = getDatabase();
 //     }
 // });
 
-// const imageRef = ref(storage, "ZdjęcieCV.png");
+// // const imageRef = ref(storage, "ZdjęcieCV.png");
 // getDownloadURL(imageRef).then((url) => {
 //     const myImage = document.getElementById("myImage");
 //     myImage.src = url;
@@ -422,12 +422,39 @@ const auth = getAuth(app);
 
 
 const loginHeader = document.getElementById("loginHeader");
+const buttonSignOut = document.getElementById("signOutButton");
+const profilePhotoInput = document.getElementById("profilePhoto");
+const sendPhotoBtn = document.getElementById("sendPhoto");
+
+buttonSignOut.addEventListener("click", () => {
+    signOut(auth);
+})
+
+sendPhotoBtn.addEventListener("click", () => {
+    const file = profilePhotoInput.files[0];
+    const fileRef = storageRef(storage, `${auth.currentUser.uid}/${file.name}`);
+    uploadBytes(fileRef, file).then(result => {
+        getDownloadURL(fileRef).then((url) => {
+            updateProfile(auth.currentUser, {
+                photoURL: url
+            });
+        });
+    });
+});
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         loginHeader.innerText = `Witaj ${user.displayName}!`
+        buttonSignOut.classList.remove("hidden");
+        profilePhotoInput.classList.remove("hidden");
+        sendPhotoBtn.classList.remove("hidden");
     }
     else {
         loginHeader.innerText = "Zaloguj się! Dziadu!";
+        buttonSignOut.classList.add("hidden");
+        profilePhotoInput.classList.add("hidden");
+        sendPhotoBtn.classList.add("hidden");
+
         const ui = new firebaseui.auth.AuthUI(auth);
         ui.start('#firebaseui-auth-container', {
             callbacks: {
