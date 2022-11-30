@@ -3,6 +3,8 @@ import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage, list, ref as storageRef } from "firebase/storage";
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore"
 import { getDatabase, onChildAdded, onValue, push, ref, remove, set } from "firebase/database";
+import { getAuth, EmailAuthProvider, onAuthStateChanged } from "firebase/auth";
+import * as firebaseui from 'firebaseui';
 
 const firebaseConfig = {
     apiKey: "AIzaSyBJwX2FSrFkzxWXTiUHzu3TcGHi-ijfPGs",
@@ -341,77 +343,103 @@ const db = getDatabase();
 // })
 
 
-const usernameInput = document.getElementById("username");
-const usercolorInput = document.getElementById("usercolor");
-const adduserBtn = document.getElementById("adduser");
-const userSelect = document.getElementById("userselect");
-const selectedUserHeader = document.getElementById("selecteduser");
-const messageInput = document.getElementById("message");
-const sendMessageBtn = document.getElementById("sendmessage");
-const messagesDiv = document.getElementById("messages");
-let selectedUser = {};
-const messagesRef = ref(db, "messages");
+// const usernameInput = document.getElementById("username");
+// const usercolorInput = document.getElementById("usercolor");
+// const adduserBtn = document.getElementById("adduser");
+// const userSelect = document.getElementById("userselect");
+// const selectedUserHeader = document.getElementById("selecteduser");
+// const messageInput = document.getElementById("message");
+// const sendMessageBtn = document.getElementById("sendmessage");
+// const messagesDiv = document.getElementById("messages");
+// let selectedUser = {};
+// const messagesRef = ref(db, "messages");
 
-onChildAdded(messagesRef, (messageSnapshot) => {
-    const message = messageSnapshot.val();
+// onChildAdded(messagesRef, (messageSnapshot) => {
+//     const message = messageSnapshot.val();
 
-    const messageDiv = document.createElement("div");
-    const textSpan = document.createElement("span");
-    const authorSpan = document.createElement("span");
-    const dateSpan = document.createElement("span");
+//     const messageDiv = document.createElement("div");
+//     const textSpan = document.createElement("span");
+//     const authorSpan = document.createElement("span");
+//     const dateSpan = document.createElement("span");
 
-    textSpan.innerText = message.text;
-    authorSpan.innerText = message.createdBy;
-    dateSpan.innerText = message.createdAt;
+//     textSpan.innerText = message.text;
+//     authorSpan.innerText = message.createdBy;
+//     dateSpan.innerText = message.createdAt;
 
-    messageDiv.appendChild(textSpan);
-    messageDiv.appendChild(authorSpan);
-    messageDiv.appendChild(dateSpan);
-    messageDiv.style.backgroundColor = message.color;
-    messageDiv.classList.add("message");
+//     messageDiv.appendChild(textSpan);
+//     messageDiv.appendChild(authorSpan);
+//     messageDiv.appendChild(dateSpan);
+//     messageDiv.style.backgroundColor = message.color;
+//     messageDiv.classList.add("message");
 
-    messagesDiv.appendChild(messageDiv);
-})
+//     messagesDiv.appendChild(messageDiv);
+// })
 
-sendMessageBtn.addEventListener("click", () => {
-    const message = {
-        text: messageInput.value,
-        createdAt: new Date().toISOString(),
-        createdBy: selectedUser.username,
-        color: selectedUser.color
-    };
+// sendMessageBtn.addEventListener("click", () => {
+//     const message = {
+//         text: messageInput.value,
+//         createdAt: new Date().toISOString(),
+//         createdBy: selectedUser.username,
+//         color: selectedUser.color
+//     };
 
-    const messageRef = push(messagesRef);
-    set(messageRef, message);
-})
+//     const messageRef = push(messagesRef);
+//     set(messageRef, message);
+// })
 
-adduserBtn.addEventListener("click", () => {
-    const userRef = ref(db, `users/${usernameInput.value}`);
-    set(userRef, {
-        color: usercolorInput.value
-    });
-});
+// adduserBtn.addEventListener("click", () => {
+//     const userRef = ref(db, `users/${usernameInput.value}`);
+//     set(userRef, {
+//         color: usercolorInput.value
+//     });
+// });
 
-userSelect.addEventListener("change", () => {
-    selectedUser = {
-        username: userSelect.value,
-        color: userSelect.selectedOptions[0].dataset.color
+// userSelect.addEventListener("change", () => {
+//     selectedUser = {
+//         username: userSelect.value,
+//         color: userSelect.selectedOptions[0].dataset.color
+//     }
+//     selectedUserHeader.innerText = userSelect.value;
+//     selectedUserHeader.style.color = userSelect.selectedOptions[0].dataset.color;
+// })
+
+// const usersRef = ref(db, "users");
+// onValue(usersRef, (snapshot) => {
+//     userSelect.innerHTML = "";
+//     const emptyOption = document.createElement("option");
+//     userSelect.appendChild(emptyOption);
+
+//     snapshot.forEach(userSnapshot => {
+//         const user = userSnapshot.val();
+//         const option = document.createElement("option");
+//         option.innerText = userSnapshot.key;
+//         option.dataset.color = user.color;
+//         userSelect.appendChild(option);
+//     })
+// })
+
+const auth = getAuth(app);
+
+
+const loginHeader = document.getElementById("loginHeader");
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        loginHeader.innerText = `Witaj ${user.displayName}!`
     }
-    selectedUserHeader.innerText = userSelect.value;
-    selectedUserHeader.style.color = userSelect.selectedOptions[0].dataset.color;
-})
-
-const usersRef = ref(db, "users");
-onValue(usersRef, (snapshot) => {
-    userSelect.innerHTML = "";
-    const emptyOption = document.createElement("option");
-    userSelect.appendChild(emptyOption);
-
-    snapshot.forEach(userSnapshot => {
-        const user = userSnapshot.val();
-        const option = document.createElement("option");
-        option.innerText = userSnapshot.key;
-        option.dataset.color = user.color;
-        userSelect.appendChild(option);
-    })
-})
+    else {
+        loginHeader.innerText = "Zaloguj się! Dziadu!";
+        const ui = new firebaseui.auth.AuthUI(auth);
+        ui.start('#firebaseui-auth-container', {
+            callbacks: {
+                signInSuccessWithAuthResult: (authResult, redirectUrl) => {
+                    console.log(authResult);
+                    console.log(redirectUrl);
+                }
+            },
+            signInOptions: [
+                EmailAuthProvider.PROVIDER_ID
+            ],
+            signInSuccessUrl: "http://localhost:8080/"
+        });
+    }
+});
