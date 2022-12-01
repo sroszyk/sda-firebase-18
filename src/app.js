@@ -578,6 +578,7 @@ onAuthStateChanged(auth, (user) => {
         displayNotes();
     }
     else {
+        container.classList.add("hidden");
         const ui = new firebaseui.auth.AuthUI(auth);
         ui.start('#firebaseui-auth-container', {
             signInOptions: [
