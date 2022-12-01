@@ -418,87 +418,141 @@ const db = getFirestore(app);
 //     })
 // })
 
-const auth = getAuth(app);
 
+// const loginHeader = document.getElementById("loginHeader");
+// const buttonSignOut = document.getElementById("signOutButton");
+// const profilePhotoInput = document.getElementById("profilePhotoInput");
+// const sendPhotoBtn = document.getElementById("sendPhoto");
+// const photoProfileImg = document.getElementById("profilePhoto"); 
+// const addressInput = document.getElementById("address");
+// const motherNameInput = document.getElementById("motherName");
+// const salary = document.getElementById("salary");
+// const phoneNumber = document.getElementById("phoneNumber");
+// const updateBtn = document.getElementById("updateBtn");
 
-const loginHeader = document.getElementById("loginHeader");
-const buttonSignOut = document.getElementById("signOutButton");
-const profilePhotoInput = document.getElementById("profilePhotoInput");
-const sendPhotoBtn = document.getElementById("sendPhoto");
-const photoProfileImg = document.getElementById("profilePhoto"); 
-const addressInput = document.getElementById("address");
-const motherNameInput = document.getElementById("motherName");
-const salary = document.getElementById("salary");
-const phoneNumber = document.getElementById("phoneNumber");
-const updateBtn = document.getElementById("updateBtn");
+// buttonSignOut.addEventListener("click", () => {
+//     signOut(auth);
+// })
 
-buttonSignOut.addEventListener("click", () => {
-    signOut(auth);
-})
+// updateBtn.addEventListener("click", () => {
+//     const docRef = doc(db, `users/R8f79i05sqYcPTBO1OeCPx1rIlJ2`);
+//     setDoc(docRef, {
+//         address: addressInput.value,
+//         motherName: motherNameInput.value,
+//         salary: salary.value,
+//         phoneNumber: phoneNumber.value
+//     });
+// })
 
-updateBtn.addEventListener("click", () => {
-    const docRef = doc(db, `users/${auth.currentUser.uid}`);
-    setDoc(docRef, {
-        address: addressInput.value,
-        motherName: motherNameInput.value,
-        salary: salary.value,
-        phoneNumber: phoneNumber.value
-    });
-})
+// // sendPhotoBtn.addEventListener("click", () => {
+// //     const file = profilePhotoInput.files[0];
+// //     const fileRef = storageRef(storage, `${auth.currentUser.uid}/${file.name}`);
+// //     uploadBytes(fileRef, file).then(result => {
+// //         getDownloadURL(fileRef).then((url) => {
+// //             updateProfile(auth.currentUser, {
+// //                 photoURL: url
+// //             });
+// //         });
+// //     });
+// // });
 
-// sendPhotoBtn.addEventListener("click", () => {
+// sendPhotoBtn.addEventListener("click", async () => {
 //     const file = profilePhotoInput.files[0];
 //     const fileRef = storageRef(storage, `${auth.currentUser.uid}/${file.name}`);
-//     uploadBytes(fileRef, file).then(result => {
-//         getDownloadURL(fileRef).then((url) => {
-//             updateProfile(auth.currentUser, {
-//                 photoURL: url
-//             });
-//         });
+//     const _ = await uploadBytes(fileRef, file);
+//     const url = await getDownloadURL(fileRef);
+//     updateProfile(auth.currentUser, {
+//         photoURL: url
 //     });
 // });
 
-sendPhotoBtn.addEventListener("click", async () => {
-    const file = profilePhotoInput.files[0];
+// onAuthStateChanged(auth, (user) => {
+//     if (user) {
+//         console.log(photoProfileImg.classList);
+//         loginHeader.innerText = `Witaj ${user.displayName}!`
+//         photoProfileImg.src = user.photoURL;
+//         buttonSignOut.classList.remove("hidden");
+//         profilePhotoInput.classList.remove("hidden");
+//         sendPhotoBtn.classList.remove("hidden");
+//         photoProfileImg.classList.remove("hidden");
+
+//     }
+//     else {
+//         loginHeader.innerText = "Zaloguj się! Dziadu!";
+//         buttonSignOut.classList.add("hidden");
+//         profilePhotoInput.classList.add("hidden");
+//         sendPhotoBtn.classList.add("hidden");
+//         photoProfileImg.classList.add("hidden");
+
+//         const ui = new firebaseui.auth.AuthUI(auth);
+//         ui.start('#firebaseui-auth-container', {
+//             callbacks: {
+//                 signInSuccessWithAuthResult: (authResult, redirectUrl) => {
+//                     console.log(authResult);
+//                     console.log(redirectUrl);
+//                 }
+//             },
+//             signInOptions: [
+//                 EmailAuthProvider.PROVIDER_ID,
+//                 GoogleAuthProvider.PROVIDER_ID
+//             ],
+//             signInSuccessUrl: "http://localhost:8080/"
+//         });
+//     }
+// });
+
+const container = document.getElementById("container");
+const auth = getAuth(app);
+const noteTitleInput = document.getElementById("noteTitle");
+const noteTextInput = document.getElementById("noteText");
+const noteThumbnailInput = document.getElementById("noteThumbnail");
+const saveBtn = document.getElementById("saveBtn");
+const previewThumbnail = document.getElementById("previewThumbnail");
+
+noteThumbnailInput.addEventListener("change", () => {
+    const file = noteThumbnailInput.files[0];
+    if (file) {
+        const fileReader = new FileReader();
+        fileReader.onloadend = function () {
+            previewThumbnail.src = fileReader.result;
+        }
+        fileReader.readAsDataURL(file);
+    }
+    else {
+        previewThumbnail.src = "";
+    }
+})
+
+saveBtn.addEventListener("click", async () => {
+    const collRef = collection(db, `users/${auth.currentUser.uid}/notes`);
+    const file = noteThumbnailInput.files[0];
     const fileRef = storageRef(storage, `${auth.currentUser.uid}/${file.name}`);
-    const _ = await uploadBytes(fileRef, file);
+    let _ = await uploadBytes(fileRef, file);
     const url = await getDownloadURL(fileRef);
-    updateProfile(auth.currentUser, {
-        photoURL: url
+
+    _ = await addDoc(collRef, {
+        title: noteTitleInput.value,
+        text: noteTextInput.value,
+        thumbnail: url
     });
+
+    noteTitleInput.value = "";
+    noteTextInput.value = "";
+    noteThumbnailInput.value = "";
+    previewThumbnail.src = "";
 });
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        console.log(photoProfileImg.classList);
-        loginHeader.innerText = `Witaj ${user.displayName}!`
-        photoProfileImg.src = user.photoURL;
-        buttonSignOut.classList.remove("hidden");
-        profilePhotoInput.classList.remove("hidden");
-        sendPhotoBtn.classList.remove("hidden");
-        photoProfileImg.classList.remove("hidden");
-        
+        container.classList.remove("hidden");
     }
     else {
-        loginHeader.innerText = "Zaloguj się! Dziadu!";
-        buttonSignOut.classList.add("hidden");
-        profilePhotoInput.classList.add("hidden");
-        sendPhotoBtn.classList.add("hidden");
-        photoProfileImg.classList.add("hidden");
-
         const ui = new firebaseui.auth.AuthUI(auth);
         ui.start('#firebaseui-auth-container', {
-            callbacks: {
-                signInSuccessWithAuthResult: (authResult, redirectUrl) => {
-                    console.log(authResult);
-                    console.log(redirectUrl);
-                }
-            },
             signInOptions: [
                 EmailAuthProvider.PROVIDER_ID,
-                GoogleAuthProvider.PROVIDER_ID
             ],
             signInSuccessUrl: "http://localhost:8080/"
         });
     }
-});
+})

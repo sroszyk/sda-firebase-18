@@ -29,3 +29,33 @@
     width: 50px;
     border-radius: 50%;
 }
+
+body{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#container{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#noteForm{
+    width: 40%;
+    
+}
+
+#previewThumbnail {
+    width: 20%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
