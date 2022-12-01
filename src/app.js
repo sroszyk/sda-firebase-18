@@ -584,7 +584,7 @@ onAuthStateChanged(auth, (user) => {
             signInOptions: [
                 EmailAuthProvider.PROVIDER_ID,
             ],
-            signInSuccessUrl: "http://localhost:8080/"
+            signInSuccessUrl: "https://sda-firebase-9021a.web.app"
         });
     }
 })
