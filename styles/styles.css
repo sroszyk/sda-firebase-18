@@ -47,15 +47,40 @@ body{
     width: 100%;
     display: flex;
     justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 #noteForm{
     width: 40%;
-    
 }
 
 #previewThumbnail {
     width: 20%;
     margin-top: 5px;
     margin-bottom: 5px;
+}
+
+#notesList {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+}
+
+.note-container {
+    display: flex;
+    border-style: solid;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+}
+.note-container img {
+    width: 100px;
+    height: 60px;
+}
+
+.text-container {
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px;
 }

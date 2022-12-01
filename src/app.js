@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage, list, ref as storageRef, uploadBytes } from "firebase/storage";
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore"
 import { getDatabase, onChildAdded, onValue, push, ref, remove, set } from "firebase/database";
-import { getAuth, EmailAuthProvider, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, EmailAuthProvider, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, getIdToken } from "firebase/auth";
 import * as firebaseui from 'firebaseui';
 
 const firebaseConfig = {
@@ -508,6 +508,7 @@ const noteTextInput = document.getElementById("noteText");
 const noteThumbnailInput = document.getElementById("noteThumbnail");
 const saveBtn = document.getElementById("saveBtn");
 const previewThumbnail = document.getElementById("previewThumbnail");
+const notesList = document.getElementById("notesList");
 
 noteThumbnailInput.addEventListener("change", () => {
     const file = noteThumbnailInput.files[0];
@@ -524,8 +525,8 @@ noteThumbnailInput.addEventListener("change", () => {
 })
 
 saveBtn.addEventListener("click", async () => {
-    const collRef = collection(db, `users/${auth.currentUser.uid}/notes`);
     const file = noteThumbnailInput.files[0];
+    const collRef = collection(db, `users/${auth.currentUser.uid}/notes`);
     const fileRef = storageRef(storage, `${auth.currentUser.uid}/${file.name}`);
     let _ = await uploadBytes(fileRef, file);
     const url = await getDownloadURL(fileRef);
@@ -542,9 +543,39 @@ saveBtn.addEventListener("click", async () => {
     previewThumbnail.src = "";
 });
 
+function displayNotes() {
+    const collRef = collection(db, `users/${auth.currentUser.uid}/notes`);
+    getDocs(collRef).then((docs) => {
+        docs.forEach(doc => {
+            const note = doc.data();
+            const noteContainer = document.createElement("div");
+            noteContainer.classList.add("note-container");
+
+            const thumbnail = document.createElement("img");
+            thumbnail.src = note.thumbnail;
+
+            const textContainer = document.createElement("div");
+            textContainer.classList.add("text-container");
+            const title = document.createElement("div");
+            title.innerText = note.title;
+
+            const text = document.createElement("div");
+            text.innerText = note.text;
+
+            textContainer.appendChild(title);
+            textContainer.appendChild(text);
+
+            noteContainer.appendChild(textContainer);
+            noteContainer.appendChild(thumbnail);
+            notesList.appendChild(noteContainer);
+        })
+    })
+}
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         container.classList.remove("hidden");
+        displayNotes();
     }
     else {
         const ui = new firebaseui.auth.AuthUI(auth);
